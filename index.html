@@ -229,7 +229,25 @@ color:#cd7f32;
 font-size:13px;
 color:#bbb;
 }
+.social-icons{
+display:flex;
+gap:14px;
+align-items:center;
+margin-top:25px;
+}
 
+.social-icons a{
+width:42px;
+height:42px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border:1px solid #c8a64a66;
+text-decoration:none;
+font-size:22px;
+}
 
 </style>
 
@@ -577,13 +595,11 @@ function podePostar(categoria){
 
 function rodapeLinks(){
   return `
-    <div class="card">
-      <h2>Redes sociais</h2>
-
-      ${config.discord ? `<a href="${config.discord}" target="_blank"><button class="discord">Discord</button></a>` : ""}
-      ${config.instagram ? `<a href="${config.instagram}" target="_blank"><button>Instagram</button></a>` : ""}
-      ${config.youtube ? `<a href="${config.youtube}" target="_blank"><button>Youtube</button></a>` : ""}
-      ${config.tiktok ? `<a href="${config.tiktok}" target="_blank"><button>TikTok</button></a>` : ""}
+    <div class="social-icons">
+      ${config.discord ? `<a href="${config.discord}" target="_blank" title="Discord">💬</a>` : ""}
+      ${config.instagram ? `<a href="${config.instagram}" target="_blank" title="Instagram">📸</a>` : ""}
+      ${config.youtube ? `<a href="${config.youtube}" target="_blank" title="Youtube">▶️</a>` : ""}
+      ${config.tiktok ? `<a href="${config.tiktok}" target="_blank" title="TikTok">🎵</a>` : ""}
     </div>
   `;
 }
@@ -726,8 +742,8 @@ async function renderVirtus(){
   let html = `
     <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
       <h1>VIRTUS RP</h1>
-      ${config.discord ? `
-        <a href="${config.discord}" target="_blank">
+      ${config.discord_virtus ? `
+        <a href="${config.discord_virtus}" target="_blank">
           <button class="discord">💬 DISCORD</button>
         </a>
       ` : ""}
@@ -762,8 +778,7 @@ async function renderVirtus(){
     `;
   });
 
-  html += rodapeLinks();
-
+  
   content.innerHTML = html;
 }
 
@@ -1245,6 +1260,7 @@ async function renderGerenciar(){
       <input id="linkInstagram" placeholder="Instagram" value="${config.instagram || ""}">
       <input id="linkYoutube" placeholder="Youtube" value="${config.youtube || ""}">
       <input id="linkTiktok" placeholder="TikTok" value="${config.tiktok || ""}">
+      <input id="linkDiscordVirtus" placeholder="Discord VIRTUS RP" value="${config.discord_virtus || ""}">
 
       <button onclick="salvarLinks()">Salvar links</button>
     </div>
@@ -1307,11 +1323,12 @@ async function salvarLinks(){
   const { error } = await db
     .from("configuracoes")
     .update({
-      discord: linkDiscord.value.trim(),
-      instagram: linkInstagram.value.trim(),
-      youtube: linkYoutube.value.trim(),
-      tiktok: linkTiktok.value.trim()
-    })
+  discord: linkDiscord.value.trim(),
+  discord_virtus: linkDiscordVirtus.value.trim(),
+  instagram: linkInstagram.value.trim(),
+  youtube: linkYoutube.value.trim(),
+  tiktok: linkTiktok.value.trim()
+})
     .eq("id", 1);
 
   if(error){
