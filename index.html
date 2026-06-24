@@ -1,1 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>The Angels Legacy</title>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<style>
+
+*{
+ box-sizing:border-box;
+ font-family:Arial;
+}
+
+
+body{
+ margin:0;
+ background:#000;
+ color:white;
+}
+
+
+header{
+ height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ flex-direction:column;
+}
+
+
+.logo{
+ width:500px;
+ max-width:90%;
+}
+
+
+button{
+ background:#111;
+ border:1px solid #777;
+ color:white;
+ padding:12px 25px;
+ border-radius:10px;
+ cursor:pointer;
+}
+
+
+.discord{
+ background:#5865F2;
+}
+
+
+input{
+ display:block;
+ margin:10px auto;
+ padding:12px;
+ width:300px;
+ background:#111;
+ color:white;
+ border:1px solid #555;
+ border-radius:8px;
+}
+
+
+.box{
+ text-align:center;
+ padding:40px;
+}
+
+
+.hidden{
+ display:none;
+}
+
+
+.card{
+ background:#111;
+ padding:20px;
+ margin:20px;
+ border-radius:15px;
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header id="home">
+
+<img class="logo" src="logo.png">
+
+
+</header>
+<nav>
+
+<button onclick="abrir('cadastro')">
+CADASTRO
+</button>
+
+<button onclick="abrir('sorteio')">
+SORTEIO
+</button>
+
+<button onclick="abrir('virtus')">
+VIRTUS RP
+</button>
+
+<button onclick="abrir('adminLogin')">
+ADMIN
+</button>
+
+</nav>
+
+
+
+
+<section id="cadastro" class="box hidden">
+
+<h1>Solicitar cadastro</h1>
+
+
+<input id="nomeCadastro" placeholder="Nome">
+
+<input id="idCadastro" placeholder="Seu ID">
+
+
+<button onclick="cadastrar()">
+Enviar solicitação
+</button>
+
+
+</section>
+
+
+
+
+
+
+<section id="sorteio" class="box hidden">
+
+
+<h1>Sorteio</h1>
+
+
+<input id="idSorteio" placeholder="Digite seu ID">
+
+
+<button onclick="participar()">
+PARTICIPAR DO SORTEIO
+</button>
+
+
+<h2>
+PARTICIPANTES:
+<span id="total">0</span>
+</h2>
+
+
+<div id="listaParticipantes"></div>
+
+
+</section>
+
+
+
+
+
+
+
+<section id="virtus" class="box hidden">
+
+
+<h1>
+VIRTUS RP
+
+<a id="discordLink" target="_blank">
+
+<button class="discord">
+💬 DISCORD
+</button>
+
+</a>
+
+</h1>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section id="adminLogin" class="box hidden">
+
+
+<h1>Login administrativo</h1>
+
+
+<input id="userAdmin" placeholder="Usuário">
+
+<input id="senhaAdmin" type="password" placeholder="Senha">
+
+
+<button onclick="loginAdmin()">
+Entrar
+</button>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section id="gerenciar" class="box hidden">
+
+
+<h1>Gerenciar</h1>
+
+
+
+<h2>Links</h2>
+
+
+<input id="discordEdit" placeholder="Discord">
+
+<input id="instagramEdit" placeholder="Instagram">
+
+<input id="youtubeEdit" placeholder="Youtube">
+
+<input id="tiktokEdit" placeholder="TikTok">
+
+
+<button onclick="salvarLinks()">
+Salvar links
+</button>
+
+
+
+
+
+
+<h2>Membros pendentes</h2>
+
+
+<div id="membros"></div>
+
+
+
+
+<h2>Logs</h2>
+
+<div id="logs"></div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+const SUPABASE_URL="https://umoadjffjupzakioudnj.supabase.co/rest/v1/";
+
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtb2FkamZmanVwemFraW91ZG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTgyNzEsImV4cCI6MjA5NzgzNDI3MX0.krssVRf5OyRnuGLsQW0FUJl0vl_mQjteKSCSvM1VldE";
+
+
+const db =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+
+
+
+function abrir(id){
+
+document.querySelectorAll(
+"section"
+)
+.forEach(
+x=>x.classList.add("hidden")
+);
+
+
+document
+.getElementById("home")
+.style.display="none";
+
+
+document
+.getElementById(id)
+.classList.remove("hidden");
+
+}
+
+
+
+
+
+
+
+
+
+async function cadastrar(){
+
+let nome =
+nomeCadastro.value;
+
+
+let usuario_id =
+idCadastro.value;
+
+
+
+if(!nome || !usuario_id){
+
+alert("Preencha tudo");
+
+return;
+
+}
+
+
+
+await db
+.from("membros")
+.insert({
+nome,
+usuario_id
+});
+
+
+
+alert(
+"Cadastro enviado!"
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+async function participar(){
+
+
+let usuario_id =
+idSorteio.value;
+
+
+if(!usuario_id){
+
+alert("Digite seu ID");
+
+return;
+
+}
+
+
+
+
+let existe =
+await db
+.from("participantes")
+.select("*")
+.eq(
+"usuario_id",
+usuario_id
+);
+
+
+
+if(
+existe.data.length > 0
+){
+
+alert(
+"Você já participa do sorteio!"
+);
+
+return;
+
+}
+
+
+
+await db
+.from("participantes")
+.insert({
+usuario_id
+});
+
+
+
+carregarParticipantes();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+async function carregarParticipantes(){
+
+
+let r =
+await db
+.from("participantes")
+.select("*");
+
+
+
+total.innerHTML =
+r.data.length;
+
+
+
+listaParticipantes.innerHTML="";
+
+
+
+r.data.forEach(p=>{
+
+
+listaParticipantes.innerHTML+=`
+
+<div class="card">
+
+ID: ${p.usuario_id}
+
+</div>
+
+`;
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+
+async function loginAdmin(){
+
+
+if(
+userAdmin.value==="webangels" &&
+senhaAdmin.value==="Legacy777"
+){
+
+
+abrir(
+"gerenciar"
+);
+
+
+carregarAdmin();
+
+
+
+}else{
+
+
+alert(
+"Login incorreto"
+);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+async function carregarAdmin(){
+
+
+
+let membrosDB =
+await db
+.from("membros")
+.select("*")
+.eq(
+"status",
+"pendente"
+);
+
+
+
+membros.innerHTML="";
+
+
+
+membrosDB.data.forEach(m=>{
+
+
+membros.innerHTML+=`
+
+<div class="card">
+
+${m.nome}
+<br>
+ID: ${m.usuario_id}
+
+<br><br>
+
+
+<button onclick="aprovar(${m.id})">
+Aprovar
+</button>
+
+
+<button onclick="excluir(${m.id})">
+🗑️
+</button>
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+
+
+
+let logDB =
+await db
+.from("logs")
+.select("*");
+
+
+
+logs.innerHTML="";
+
+
+
+logDB.data.forEach(l=>{
+
+
+logs.innerHTML+=`
+
+<div>
+
+${l.acao}
+
+</div>
+
+
+`;
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function aprovar(id){
+
+
+
+await db
+.from("membros")
+.update({
+status:"aprovado"
+})
+.eq(
+"id",
+id
+);
+
+
+
+await db
+.from("logs")
+.insert({
+acao:
+"Cadastro aprovado ID "+id
+});
+
+
+
+carregarAdmin();
+
+
+}
+
+
+
+
+
+
+
+
+
+async function excluir(id){
+
+
+await db
+.from("membros")
+.delete()
+.eq(
+"id",
+id
+);
+
+
+
+await db
+.from("logs")
+.insert({
+acao:
+"Cadastro excluído ID "+id
+});
+
+
+
+carregarAdmin();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+async function salvarLinks(){
+
+
+
+await db
+.from("links")
+.update({
+
+discord:
+discordEdit.value,
+
+
+instagram:
+instagramEdit.value,
+
+
+youtube:
+youtubeEdit.value,
+
+
+tiktok:
+tiktokEdit.value
+
+
+})
+.eq(
+"id",
+1
+);
+
+
+
+alert(
+"Links atualizados!"
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+async function carregarLinks(){
+
+
+
+let r =
+await db
+.from("links")
+.select("*")
+.single();
+
+
+
+if(r.data){
+
+
+discordLink.href =
+r.data.discord;
+
+
+}
+
+
+}
+
+
+
+carregarParticipantes();
+
+carregarLinks();
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
