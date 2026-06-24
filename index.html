@@ -1,787 +1,905 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Angels Legacy</title>
-
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
 <style>
-
-*{
- box-sizing:border-box;
- font-family:Arial;
-}
-
-
+*{box-sizing:border-box}
 body{
- margin:0;
- background:#000;
- color:white;
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#090909;
+  color:#f5f5f5;
 }
-
-
-header{
- height:100vh;
- display:flex;
- justify-content:center;
- align-items:center;
- flex-direction:column;
-}
-
-
-.logo{
- width:500px;
- max-width:90%;
-}
-
-
+button,input,textarea{font-family:inherit}
 button{
- background:#111;
- border:1px solid #777;
- color:white;
- padding:12px 25px;
- border-radius:10px;
- cursor:pointer;
+  cursor:pointer;
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  background:#c8a64a;
+  color:#090909;
+  font-weight:700;
 }
-
-
-.discord{
- background:#5865F2;
+button.secondary{
+  background:#151515;
+  color:#f5f5f5;
+  border:1px solid #3a3a3a;
 }
-
-
-input{
- display:block;
- margin:10px auto;
- padding:12px;
- width:300px;
- background:#111;
- color:white;
- border:1px solid #555;
- border-radius:8px;
+button.danger{
+  background:#7f1d1d;
+  color:white;
 }
-
-
-.box{
- text-align:center;
- padding:40px;
+button.discord{
+  background:#5865f2;
+  color:white;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
-
-
-.hidden{
- display:none;
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
 }
-
-
+input,textarea{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #333;
+  background:#111;
+  color:white;
+  outline:none;
+}
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+.auth-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:radial-gradient(circle at top,#1b1507,#050505 55%);
+}
+.auth-box{
+  width:100%;
+  max-width:430px;
+}
+.auth-logo{
+  text-align:center;
+  margin-bottom:22px;
+}
+.auth-logo img{
+  max-width:100%;
+  max-height:220px;
+  object-fit:contain;
+}
 .card{
- background:#111;
- padding:20px;
- margin:20px;
- border-radius:15px;
+  background:#111;
+  border:1px solid rgba(200,166,74,.35);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 0 40px rgba(0,0,0,.5);
 }
-
-
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:18px;
+}
+.tab{
+  background:#171717;
+  color:white;
+  border:1px solid #333;
+}
+.tab.active{
+  background:#c8a64a;
+  color:#090909;
+}
+.form{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+label{
+  font-size:13px;
+  color:#d7c68b;
+}
+.small{
+  font-size:12px;
+  color:#aaa;
+  line-height:1.4;
+}
+.app{
+  min-height:100vh;
+  display:flex;
+}
+.sidebar{
+  width:255px;
+  background:#070707;
+  border-right:1px solid #262626;
+  display:flex;
+  flex-direction:column;
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+}
+.side-logo{
+  padding:22px;
+  text-align:center;
+  border-bottom:1px solid #262626;
+}
+.side-logo img{
+  max-width:190px;
+  max-height:120px;
+  object-fit:contain;
+}
+.nav{
+  padding:12px;
+  flex:1;
+  overflow:auto;
+}
+.nav button{
+  width:100%;
+  margin-bottom:8px;
+  text-align:left;
+  background:transparent;
+  color:#ddd;
+  border:1px solid transparent;
+}
+.nav button.active,.nav button:hover{
+  border-color:rgba(200,166,74,.45);
+  background:rgba(200,166,74,.12);
+  color:#d7c68b;
+}
+.userbox{
+  border-top:1px solid #262626;
+  padding:14px;
+}
+.main{
+  margin-left:255px;
+  width:calc(100% - 255px);
+  padding:32px;
+}
+.title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+h1{
+  color:#d7c68b;
+  letter-spacing:2px;
+  margin:0;
+}
+h2{
+  color:#d7c68b;
+}
+.grid{
+  display:grid;
+  gap:18px;
+}
+.post{
+  white-space:pre-wrap;
+}
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.table{
+  width:100%;
+  border-collapse:collapse;
+}
+.table th,.table td{
+  padding:12px;
+  border-bottom:1px solid #2b2b2b;
+  text-align:left;
+}
+.table th{
+  color:#d7c68b;
+  font-size:12px;
+  text-transform:uppercase;
+}
+.badge{
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+.ok{background:rgba(34,197,94,.18);color:#4ade80}
+.no{background:rgba(239,68,68,.18);color:#f87171}
+.hidden{display:none!important}
+.notice{
+  max-width:460px;
+  margin:80px auto;
+  text-align:center;
+}
+.footer-links{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:25px;
+}
+.footer-links a{
+  color:#d7c68b;
+  text-decoration:none;
+  border:1px solid rgba(200,166,74,.35);
+  padding:8px 10px;
+  border-radius:10px;
+}
+@media(max-width:800px){
+  .app{display:block}
+  .sidebar{
+    position:relative;
+    width:100%;
+    height:auto;
+  }
+  .main{
+    margin-left:0;
+    width:100%;
+    padding:18px;
+  }
+}
 </style>
-
 </head>
-
 
 <body>
 
-
-<header id="home">
-
-<img class="logo" src="logo.png">
-
-
-</header>
-<nav>
-
-<button onclick="abrir('cadastro')">
-CADASTRO
-</button>
-
-<button onclick="abrir('sorteio')">
-SORTEIO
-</button>
-
-<button onclick="abrir('virtus')">
-VIRTUS RP
-</button>
-
-<button onclick="abrir('adminLogin')">
-ADMIN
-</button>
-
-</nav>
-
-
-
-
-<section id="cadastro" class="box hidden">
-
-<h1>Solicitar cadastro</h1>
-
-
-<input id="nomeCadastro" placeholder="Nome">
-
-<input id="idCadastro" placeholder="Seu ID">
-
-
-<button onclick="cadastrar()">
-Enviar solicitação
-</button>
-
-
-</section>
-
-
-
-
-
-
-<section id="sorteio" class="box hidden">
-
-
-<h1>Sorteio</h1>
-
-
-<input id="idSorteio" placeholder="Digite seu ID">
-
-
-<button onclick="participar()">
-PARTICIPAR DO SORTEIO
-</button>
-
-
-<h2>
-PARTICIPANTES:
-<span id="total">0</span>
-</h2>
-
-
-<div id="listaParticipantes"></div>
-
-
-</section>
-
-
-
-
-
-
-
-<section id="virtus" class="box hidden">
-
-
-<h1>
-VIRTUS RP
-
-<a id="discordLink" target="_blank">
-
-<button class="discord">
-💬 DISCORD
-</button>
-
-</a>
-
-</h1>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<section id="adminLogin" class="box hidden">
-
-
-<h1>Login administrativo</h1>
-
-
-<input id="userAdmin" placeholder="Usuário">
-
-<input id="senhaAdmin" type="password" placeholder="Senha">
-
-
-<button onclick="loginAdmin()">
-Entrar
-</button>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<section id="gerenciar" class="box hidden">
-
-
-<h1>Gerenciar</h1>
-
-
-
-<h2>Links</h2>
-
-
-<input id="discordEdit" placeholder="Discord">
-
-<input id="instagramEdit" placeholder="Instagram">
-
-<input id="youtubeEdit" placeholder="Youtube">
-
-<input id="tiktokEdit" placeholder="TikTok">
-
-
-<button onclick="salvarLinks()">
-Salvar links
-</button>
-
-
-
-
-
-
-<h2>Membros pendentes</h2>
-
-
-<div id="membros"></div>
-
-
-
-
-<h2>Logs</h2>
-
-<div id="logs"></div>
-
-
-
-</section>
-
-
-
-
-
-
-
-
+<div id="root"></div>
 
 <script>
+const SUPABASE_URL = "https://kljlqprmrwaepfqsdofi.supabase.co";
+const SUPABASE_KEY = "sb_publishable_CWMEHtxl8fd6xYzAggR64g_pFCl_1ik";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let session = null;
+let profile = null;
+let role = "member";
+let currentPage = "the-angels";
+let links = {
+  discord:"",
+  instagram:"",
+  youtube:"",
+  tiktok:"",
+  facebook:"",
+  whatsapp:""
+};
 
-const SUPABASE_URL="https://umoadjffjupzakioudnj.supabase.co/rest/v1/";
+const categories = [
+  ["the-angels","THE ANGELS"],
+  ["recrutamento","RECRUTAMENTO"],
+  ["elite-legacy","ELITE LEGACY"],
+  ["eventos","EVENTOS"],
+  ["sorteio","SORTEIO"],
+  ["virtus-rp","VIRTUS RP"]
+];
 
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtb2FkamZmanVwemFraW91ZG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTgyNzEsImV4cCI6MjA5NzgzNDI3MX0.krssVRf5OyRnuGLsQW0FUJl0vl_mQjteKSCSvM1VldE";
-
-
-const db =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
-
-
-
-
-
-function abrir(id){
-
-document.querySelectorAll(
-"section"
-)
-.forEach(
-x=>x.classList.add("hidden")
-);
-
-
-document
-.getElementById("home")
-.style.display="none";
-
-
-document
-.getElementById(id)
-.classList.remove("hidden");
-
+function usernameToEmail(username){
+  return username.trim().toLowerCase().replace(/[^a-z0-9_]/g,"") + "@webangels.local";
 }
 
+function el(id){return document.getElementById(id)}
 
-
-
-
-
-
-
-
-async function cadastrar(){
-
-let nome =
-nomeCadastro.value;
-
-
-let usuario_id =
-idCadastro.value;
-
-
-
-if(!nome || !usuario_id){
-
-alert("Preencha tudo");
-
-return;
-
+async function logAction(action, details={}){
+  try{
+    if(!session?.user) return;
+    await db.from("logs").insert({
+      user_id: session.user.id,
+      username: profile?.username || "",
+      action,
+      details
+    });
+  }catch(e){}
 }
 
+async function loadLinks(){
+  try{
+    const {data} = await db.from("site_settings").select("cover_url").eq("id",1).maybeSingle();
+    if(data?.cover_url && data.cover_url.startsWith("links:")){
+      links = JSON.parse(data.cover_url.replace("links:",""));
+    }
+  }catch(e){}
+}
 
+async function saveLinks(){
+  links.discord = el("link_discord").value.trim();
+  links.instagram = el("link_instagram").value.trim();
+  links.youtube = el("link_youtube").value.trim();
+  links.tiktok = el("link_tiktok").value.trim();
+  links.facebook = el("link_facebook").value.trim();
+  links.whatsapp = el("link_whatsapp").value.trim();
 
-await db
-.from("membros")
-.insert({
-nome,
-usuario_id
+  const {error} = await db.from("site_settings").update({
+    cover_url:"links:" + JSON.stringify(links)
+  }).eq("id",1);
+
+  if(error) return alert(error.message);
+
+  await logAction("links.update", links);
+  alert("Links salvos!");
+  render();
+}
+
+async function loadUser(){
+  const {data} = await db.auth.getSession();
+  session = data.session;
+
+  if(!session){
+    profile = null;
+    role = "member";
+    return;
+  }
+
+  const p = await db.from("profiles").select("*").eq("id",session.user.id).maybeSingle();
+  profile = p.data;
+
+  const r = await db.from("user_roles").select("role").eq("user_id",session.user.id);
+  role = r.data?.find(x=>x.role==="admin")?.role || r.data?.find(x=>x.role==="virtus_manager")?.role || "member";
+}
+
+function renderAuth(tab="signin"){
+  document.body.innerHTML = `
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <img src="logo.png" alt="The Angels Legacy">
+      </div>
+
+      <div class="card">
+        <div class="tabs">
+          <button class="tab ${tab==="signin"?"active":""}" onclick="renderAuth('signin')">Entrar</button>
+          <button class="tab ${tab==="signup"?"active":""}" onclick="renderAuth('signup')">Cadastrar</button>
+        </div>
+
+        ${tab==="signin" ? `
+          <form class="form" onsubmit="signIn(event)">
+            <div>
+              <label>Usuário</label>
+              <input id="login_user" required>
+            </div>
+            <div>
+              <label>Senha</label>
+              <input id="login_pass" type="password" required>
+            </div>
+            <button type="submit">Entrar</button>
+          </form>
+        ` : `
+          <form class="form" onsubmit="signUp(event)">
+            <div>
+              <label>Usuário</label>
+              <input id="cad_user" required>
+            </div>
+            <div>
+              <label>ID</label>
+              <input id="cad_id" required placeholder="Digite seu ID">
+            </div>
+            <div>
+              <label>Senha</label>
+              <input id="cad_pass" type="password" required>
+            </div>
+            <button type="submit">Cadastrar</button>
+            <p class="small">Seu cadastro fica pendente até o administrador aprovar.</p>
+          </form>
+        `}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+async function signIn(e){
+  e.preventDefault();
+
+  const username = el("login_user").value;
+  const password = el("login_pass").value;
+
+  const {error} = await db.auth.signInWithPassword({
+    email: usernameToEmail(username),
+    password
+  });
+
+  if(error) return alert("Usuário ou senha inválidos");
+
+  await init();
+}
+
+async function signUp(e){
+  e.preventDefault();
+
+  const username = el("cad_user").value.trim().toLowerCase().replace(/[^a-z0-9_]/g,"");
+  const userGameId = el("cad_id").value.trim();
+  const password = el("cad_pass").value;
+
+  if(username.length < 3) return alert("Usuário precisa ter pelo menos 3 caracteres");
+  if(!userGameId) return alert("Digite seu ID");
+  if(password.length < 6) return alert("Senha precisa ter pelo menos 6 caracteres");
+
+  const {data,error} = await db.auth.signUp({
+    email: usernameToEmail(username),
+    password,
+    options:{
+      data:{
+        username,
+        user_game_id:userGameId
+      },
+      emailRedirectTo: window.location.origin
+    }
+  });
+
+  if(error) return alert(error.message);
+
+  if(data.session){
+    session = data.session;
+    await loadUser();
+    await logAction("auth.signup", {username,user_game_id:userGameId});
+    await db.auth.signOut();
+  }
+
+  alert("Cadastro enviado! Aguarde aprovação do administrador.");
+  renderAuth("signin");
+}
+
+async function signOut(){
+  await logAction("auth.signout");
+  await db.auth.signOut();
+  session = null;
+  profile = null;
+  renderAuth();
+}
+
+function appShell(content){
+  document.body.innerHTML = `
+  <div class="app">
+    <aside class="sidebar">
+      <div class="side-logo">
+        <img src="logo.png" alt="The Angels Legacy">
+      </div>
+
+      <nav class="nav">
+        ${categories.map(c=>`
+          <button class="${currentPage===c[0]?"active":""}" onclick="openPage('${c[0]}')">${c[1]}</button>
+        `).join("")}
+
+        ${role==="admin" ? `
+          <button class="${currentPage==="logs"?"active":""}" onclick="openPage('logs')">LOGS</button>
+          <button class="${currentPage==="admin"?"active":""}" onclick="openPage('admin')">GERENCIAR</button>
+        ` : ""}
+      </nav>
+
+      <div class="userbox">
+        <b>${profile?.username || "Usuário"}</b>
+        <p class="small">${role==="admin"?"Administrador":role==="virtus_manager"?"Gerente VIRTUS":"Membro"}</p>
+        <button class="secondary" onclick="signOut()">Sair</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      ${content}
+      ${renderFooterLinks()}
+    </main>
+  </div>
+  `;
+}
+
+function renderFooterLinks(){
+  const items = [
+    ["Instagram",links.instagram],
+    ["Youtube",links.youtube],
+    ["TikTok",links.tiktok],
+    ["Facebook",links.facebook],
+    ["Whatsapp",links.whatsapp]
+  ].filter(x=>x[1]);
+
+  if(!items.length) return "";
+
+  return `<div class="footer-links">${items.map(i=>`<a href="${i[1]}" target="_blank">${i[0]}</a>`).join("")}</div>`;
+}
+
+async function openPage(page){
+  currentPage = page;
+  await render();
+}
+
+async function render(){
+  await loadLinks();
+
+  if(!session){
+    renderAuth();
+    return;
+  }
+
+  if(!profile?.approved){
+    document.body.innerHTML = `
+    <div class="auth-page">
+      <div class="notice card">
+        <img src="logo.png" style="max-width:260px;width:100%;margin-bottom:20px">
+        <h1>Aguardando aprovação</h1>
+        <p class="small">Sua conta foi criada e está aguardando aprovação do administrador.</p>
+        <button class="secondary" onclick="signOut()">Sair</button>
+      </div>
+    </div>
+    `;
+    return;
+  }
+
+  if(currentPage==="sorteio") return renderSorteio();
+  if(currentPage==="admin") return renderAdmin();
+  if(currentPage==="logs") return renderLogs();
+  return renderCategory(currentPage);
+}
+
+async function renderCategory(slug){
+  const cat = categories.find(c=>c[0]===slug);
+  const canPost = role==="admin" || (slug==="virtus-rp" && role==="virtus_manager");
+
+  const posts = await db.from("posts").select("*").eq("category_slug",slug).order("created_at",{ascending:false});
+
+  appShell(`
+    <div class="title-row">
+      <h1>${cat ? cat[1] : slug}</h1>
+      ${slug==="virtus-rp" && links.discord ? `
+        <a href="${links.discord}" target="_blank">
+          <button class="discord">💬 DISCORD</button>
+        </a>
+      ` : ""}
+    </div>
+
+    ${canPost ? `
+      <section class="card form" style="margin-bottom:20px">
+        <h2>Nova publicação</h2>
+        <textarea id="post_text" placeholder="Escreva algo..."></textarea>
+        <button onclick="createPost('${slug}')">Publicar</button>
+      </section>
+    ` : ""}
+
+    <section class="grid">
+      ${(posts.data || []).length ? posts.data.map(p=>`
+        <article class="card">
+          <div class="small">${new Date(p.created_at).toLocaleString("pt-BR")}</div>
+          <div class="post">${escapeHtml(p.text || "")}</div>
+          ${canPost ? `<br><button class="danger" onclick="deletePost('${p.id}')">Excluir</button>` : ""}
+        </article>
+      `).join("") : `<p class="small">Nenhuma publicação ainda.</p>`}
+    </section>
+  `);
+}
+
+async function createPost(slug){
+  const text = el("post_text").value.trim();
+  if(!text) return alert("Digite algo para publicar");
+
+  const {error} = await db.from("posts").insert({
+    category_slug:slug,
+    author_id:session.user.id,
+    text,
+    media:[]
+  });
+
+  if(error) return alert(error.message);
+
+  await logAction("post.create",{category_slug:slug});
+  renderCategory(slug);
+}
+
+async function deletePost(id){
+  if(!confirm("Excluir publicação?")) return;
+
+  const {error} = await db.from("posts").delete().eq("id",id);
+  if(error) return alert(error.message);
+
+  await logAction("post.delete",{id});
+  render();
+}
+
+async function renderSorteio(){
+  const isAdmin = role==="admin";
+  const giveaways = await db.from("giveaways").select("*").order("created_at",{ascending:false});
+
+  let html = `
+  <div class="title-row">
+    <h1>SORTEIO</h1>
+  </div>
+
+  ${isAdmin ? `
+    <section class="card form" style="margin-bottom:20px">
+      <h2>Criar sorteio</h2>
+      <input id="give_title" placeholder="Título do sorteio">
+      <textarea id="give_text" placeholder="Descrição"></textarea>
+      <button onclick="createGiveaway()">Criar sorteio</button>
+    </section>
+  ` : ""}
+  `;
+
+  if(!giveaways.data || giveaways.data.length===0){
+    html += `<p class="small">Nenhum sorteio no momento.</p>`;
+    appShell(html);
+    return;
+  }
+
+  for(const g of giveaways.data){
+    const parts = await db
+      .from("giveaway_participants")
+      .select("id,user_id,created_at,profiles(username)")
+      .eq("giveaway_id",g.id)
+      .order("created_at",{ascending:true});
+
+    const list = parts.data || [];
+    const already = list.some(p=>p.user_id===session.user.id);
+
+    html += `
+    <article class="card" style="margin-bottom:20px">
+      <div class="title-row">
+        <div>
+          <h2>${escapeHtml(g.title)}</h2>
+          <p class="small">${escapeHtml(g.text || "")}</p>
+        </div>
+        ${isAdmin ? `<button class="danger" onclick="removeGiveaway('${g.id}')">Excluir</button>` : ""}
+      </div>
+
+      <button ${already || !g.active ? "disabled":""} onclick="joinGiveaway('${g.id}')">
+        ${already ? "VOCÊ JÁ ESTÁ PARTICIPANDO" : "PARTICIPAR DO SORTEIO"}
+      </button>
+
+      <h2>PARTICIPANTES: ${list.length}</h2>
+
+      <div class="grid">
+        ${list.length ? list.map(p=>`
+          <div class="card">
+            ${escapeHtml(p.profiles?.username || "Usuário")}
+          </div>
+        `).join("") : `<p class="small">Nenhum participante ainda.</p>`}
+      </div>
+    </article>
+    `;
+  }
+
+  appShell(html);
+}
+
+async function createGiveaway(){
+  const title = el("give_title").value.trim();
+  const text = el("give_text").value.trim();
+
+  if(!title) return alert("Digite o título do sorteio");
+
+  const {error} = await db.from("giveaways").insert({
+    title,
+    text,
+    media:[],
+    active:true
+  });
+
+  if(error) return alert(error.message);
+
+  await logAction("giveaway.create",{title});
+  renderSorteio();
+}
+
+async function joinGiveaway(id){
+  const {error} = await db.from("giveaway_participants").insert({
+    giveaway_id:id,
+    user_id:session.user.id
+  });
+
+  if(error){
+    alert("Você já está participando ou ocorreu um erro.");
+    return;
+  }
+
+  await logAction("giveaway.join",{giveaway_id:id});
+  renderSorteio();
+}
+
+async function removeGiveaway(id){
+  if(!confirm("Excluir sorteio?")) return;
+
+  const {error} = await db.from("giveaways").delete().eq("id",id);
+  if(error) return alert(error.message);
+
+  await logAction("giveaway.delete",{id});
+  renderSorteio();
+}
+
+async function renderAdmin(){
+  if(role!=="admin") return openPage("the-angels");
+
+  const members = await db.from("profiles").select("*").order("created_at",{ascending:false});
+  const logs = await db.from("logs").select("*").order("created_at",{ascending:false}).limit(200);
+
+  const deleted = "__deleted__";
+  const visibleMembers = (members.data || []).filter(m=>m.avatar_url !== deleted);
+
+  appShell(`
+    <div class="title-row">
+      <h1>GERENCIAR</h1>
+    </div>
+
+    <section class="card form" style="margin-bottom:20px">
+      <h2>LINKS</h2>
+
+      <label>Discord do VIRTUS RP</label>
+      <input id="link_discord" value="${escapeAttr(links.discord)}" placeholder="https://discord.gg/...">
+
+      <label>Instagram</label>
+      <input id="link_instagram" value="${escapeAttr(links.instagram)}" placeholder="https://instagram.com/...">
+
+      <label>Youtube</label>
+      <input id="link_youtube" value="${escapeAttr(links.youtube)}" placeholder="https://youtube.com/...">
+
+      <label>TikTok</label>
+      <input id="link_tiktok" value="${escapeAttr(links.tiktok)}" placeholder="https://tiktok.com/...">
+
+      <label>Facebook</label>
+      <input id="link_facebook" value="${escapeAttr(links.facebook)}" placeholder="https://facebook.com/...">
+
+      <label>Whatsapp</label>
+      <input id="link_whatsapp" value="${escapeAttr(links.whatsapp)}" placeholder="https://wa.me/...">
+
+      <button onclick="saveLinks()">Salvar links</button>
+    </section>
+
+    <section class="card" style="margin-bottom:20px">
+      <h2>MEMBROS</h2>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>ID</th>
+            <th>Cadastro</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visibleMembers.map(m=>{
+            const signupLog = (logs.data || []).find(l =>
+              l.action==="auth.signup" &&
+              l.details &&
+              l.details.username === m.username
+            );
+            const gameId = signupLog?.details?.user_game_id || m.id;
+
+            return `
+            <tr>
+              <td>${escapeHtml(m.username)}</td>
+              <td>${escapeHtml(gameId)}</td>
+              <td>${new Date(m.created_at).toLocaleDateString("pt-BR")}</td>
+              <td>
+                <span class="badge ${m.approved?"ok":"no"}">
+                  ${m.approved?"Aprovado":"Pendente"}
+                </span>
+              </td>
+              <td>
+                <div class="row">
+                  ${m.approved ? `
+                    <button class="secondary" onclick="setApproval('${m.id}',false)">Revogar</button>
+                  ` : `
+                    <button onclick="setApproval('${m.id}',true)">Aprovar</button>
+                    <button class="danger" title="Excluir solicitação" onclick="deleteRequest('${m.id}','${escapeAttr(m.username)}')">🗑️</button>
+                  `}
+                </div>
+              </td>
+            </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>LOGS RECENTES</h2>
+      <div class="grid">
+        ${(logs.data || []).slice(0,20).map(l=>`
+          <div>
+            <b>${escapeHtml(l.action)}</b>
+            <div class="small">${new Date(l.created_at).toLocaleString("pt-BR")} — ${escapeHtml(l.username || "")}</div>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `);
+}
+
+async function setApproval(id,approved){
+  const {error} = await db.from("profiles").update({approved}).eq("id",id);
+  if(error) return alert(error.message);
+
+  await logAction(approved ? "member.approve" : "member.revoke",{id});
+  renderAdmin();
+}
+
+async function deleteRequest(id,username){
+  if(!confirm("Excluir/cancelar esta solicitação de cadastro?")) return;
+
+  const {error} = await db.from("profiles").update({
+    approved:false,
+    avatar_url:"__deleted__"
+  }).eq("id",id);
+
+  if(error) return alert(error.message);
+
+  await logAction("member.request_delete",{id,username});
+  renderAdmin();
+}
+
+async function renderLogs(){
+  if(role!=="admin") return openPage("the-angels");
+
+  const logs = await db.from("logs").select("*").order("created_at",{ascending:false}).limit(300);
+
+  appShell(`
+    <div class="title-row">
+      <h1>LOGS</h1>
+    </div>
+
+    <section class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Usuário</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(logs.data || []).map(l=>`
+            <tr>
+              <td>${new Date(l.created_at).toLocaleString("pt-BR")}</td>
+              <td>${escapeHtml(l.username || "")}</td>
+              <td>${escapeHtml(l.action)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </section>
+  `);
+}
+
+function escapeHtml(text){
+  return String(text || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function escapeAttr(text){
+  return escapeHtml(text).replaceAll("\n","");
+}
+
+async function init(){
+  await loadUser();
+  await loadLinks();
+
+  if(!session){
+    renderAuth();
+    return;
+  }
+
+  if(role==="admin" && profile?.username==="webangels"){
+    profile.approved = true;
+  }
+
+  await render();
+}
+
+db.auth.onAuthStateChange(async()=>{
+  await loadUser();
 });
 
-
-
-alert(
-"Cadastro enviado!"
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-async function participar(){
-
-
-let usuario_id =
-idSorteio.value;
-
-
-if(!usuario_id){
-
-alert("Digite seu ID");
-
-return;
-
-}
-
-
-
-
-let existe =
-await db
-.from("participantes")
-.select("*")
-.eq(
-"usuario_id",
-usuario_id
-);
-
-
-
-if(
-existe.data.length > 0
-){
-
-alert(
-"Você já participa do sorteio!"
-);
-
-return;
-
-}
-
-
-
-await db
-.from("participantes")
-.insert({
-usuario_id
-});
-
-
-
-carregarParticipantes();
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-async function carregarParticipantes(){
-
-
-let r =
-await db
-.from("participantes")
-.select("*");
-
-
-
-total.innerHTML =
-r.data.length;
-
-
-
-listaParticipantes.innerHTML="";
-
-
-
-r.data.forEach(p=>{
-
-
-listaParticipantes.innerHTML+=`
-
-<div class="card">
-
-ID: ${p.usuario_id}
-
-</div>
-
-`;
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-
-async function loginAdmin(){
-
-
-if(
-userAdmin.value==="webangels" &&
-senhaAdmin.value==="Legacy777"
-){
-
-
-abrir(
-"gerenciar"
-);
-
-
-carregarAdmin();
-
-
-
-}else{
-
-
-alert(
-"Login incorreto"
-);
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-
-
-async function carregarAdmin(){
-
-
-
-let membrosDB =
-await db
-.from("membros")
-.select("*")
-.eq(
-"status",
-"pendente"
-);
-
-
-
-membros.innerHTML="";
-
-
-
-membrosDB.data.forEach(m=>{
-
-
-membros.innerHTML+=`
-
-<div class="card">
-
-${m.nome}
-<br>
-ID: ${m.usuario_id}
-
-<br><br>
-
-
-<button onclick="aprovar(${m.id})">
-Aprovar
-</button>
-
-
-<button onclick="excluir(${m.id})">
-🗑️
-</button>
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
-
-
-
-
-let logDB =
-await db
-.from("logs")
-.select("*");
-
-
-
-logs.innerHTML="";
-
-
-
-logDB.data.forEach(l=>{
-
-
-logs.innerHTML+=`
-
-<div>
-
-${l.acao}
-
-</div>
-
-
-`;
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-
-async function aprovar(id){
-
-
-
-await db
-.from("membros")
-.update({
-status:"aprovado"
-})
-.eq(
-"id",
-id
-);
-
-
-
-await db
-.from("logs")
-.insert({
-acao:
-"Cadastro aprovado ID "+id
-});
-
-
-
-carregarAdmin();
-
-
-}
-
-
-
-
-
-
-
-
-
-async function excluir(id){
-
-
-await db
-.from("membros")
-.delete()
-.eq(
-"id",
-id
-);
-
-
-
-await db
-.from("logs")
-.insert({
-acao:
-"Cadastro excluído ID "+id
-});
-
-
-
-carregarAdmin();
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-async function salvarLinks(){
-
-
-
-await db
-.from("links")
-.update({
-
-discord:
-discordEdit.value,
-
-
-instagram:
-instagramEdit.value,
-
-
-youtube:
-youtubeEdit.value,
-
-
-tiktok:
-tiktokEdit.value
-
-
-})
-.eq(
-"id",
-1
-);
-
-
-
-alert(
-"Links atualizados!"
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-async function carregarLinks(){
-
-
-
-let r =
-await db
-.from("links")
-.select("*")
-.single();
-
-
-
-if(r.data){
-
-
-discordLink.href =
-r.data.discord;
-
-
-}
-
-
-}
-
-
-
-carregarParticipantes();
-
-carregarLinks();
-
-
-
+init();
 </script>
 
-
-
 </body>
-
 </html>
