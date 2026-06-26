@@ -22,7 +22,7 @@ font-family:Arial,Helvetica,sans-serif;
 body{
 margin:0;
 background:#050505;
-color:white;
+color:#00bcff;
 }
 
 
@@ -31,8 +31,8 @@ cursor:pointer;
 border:0;
 border-radius:10px;
 padding:10px 18px;
-background:#c8a64a;
-color:#000;
+background:#fff;
+color:#050505;
 font-weight:bold;
 }
 
@@ -49,7 +49,7 @@ margin:8px 0;
 background:#111;
 border:1px solid #333;
 border-radius:10px;
-color:white;
+color:#00bcff;
 }
 
 
@@ -72,14 +72,14 @@ display:flex;
 align-items:center;
 justify-content:center;
 background:
-radial-gradient(circle,#241b04,#050505 60%);
+radial-gradient(circle,#00364a,#050505 60%);
 }
 
 
 .loginBox{
 width:430px;
 background:#101010;
-border:1px solid #c8a64a66;
+border:1px solid #00bcff66;
 padding:30px;
 border-radius:18px;
 box-shadow:0 0 40px black;
@@ -104,13 +104,13 @@ margin-bottom:20px;
 
 .tabs button{
 background:#222;
-color:white;
+color:#00bcff;
 }
 
 
 .tabs .ativo{
-background:#c8a64a;
-color:black;
+background:#fff;
+color:#050505;
 }
 
 
@@ -147,7 +147,7 @@ flex:1;
 .menu button{
 width:100%;
 background:#111;
-color:white;
+color:#00bcff;
 border:1px solid #333;
 margin-bottom:10px;
 text-align:left;
@@ -155,8 +155,8 @@ text-align:left;
 
 
 .menu button:hover{
-border-color:#c8a64a;
-color:#c8a64a;
+border-color:#fff;
+color:#fff;
 }
 
 
@@ -167,7 +167,7 @@ padding:35px;
 
 
 h1,h2{
-color:#d6b64d;
+color:#fff;
 }
 
 
@@ -190,13 +190,13 @@ margin-top:10px;
 
 .discord{
 background:#5865F2;
-color:white;
+color:#00bcff;
 }
 
 
 .delete{
 background:#8b0000;
-color:white;
+color:#00bcff;
 }
 
 
@@ -211,7 +211,7 @@ color:#ff4444;
 
 
 .rank1{
-color:gold;
+color:#fff;
 }
 
 
@@ -244,9 +244,85 @@ display:flex;
 align-items:center;
 justify-content:center;
 background:#111;
-border:1px solid #c8a64a66;
+border:1px solid #00bcff66;
 text-decoration:none;
 font-size:22px;
+}
+
+
+/* MODAL / UPLOAD / TEXTO FORMATADO */
+
+.modalOverlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.78);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+padding:20px;
+}
+
+.modalBox{
+width:420px;
+max-width:100%;
+background:#101010;
+border:1px solid #00bcff66;
+border-radius:18px;
+padding:25px;
+box-shadow:0 0 40px black;
+}
+
+.modalActions{
+display:flex;
+gap:10px;
+justify-content:flex-end;
+margin-top:10px;
+}
+
+.uploadStatus{
+display:none;
+margin:10px 0 12px;
+background:#050505;
+border:1px solid #333;
+border-radius:12px;
+padding:10px;
+}
+
+.uploadStatus.ativo{
+display:block;
+}
+
+.progressBar{
+width:100%;
+height:12px;
+background:#111;
+border-radius:999px;
+overflow:hidden;
+border:1px solid #333;
+}
+
+.progressFill{
+width:0%;
+height:100%;
+background:#00bcff;
+transition:width .2s ease;
+}
+
+.progressText{
+font-size:13px;
+margin-top:6px;
+color:#00bcff;
+}
+
+.formattedText{
+white-space:pre-wrap;
+word-break:break-word;
+}
+
+button:disabled{
+opacity:.55;
+cursor:not-allowed;
 }
 
 </style>
@@ -417,6 +493,24 @@ id="content">
 
 
 </div>
+
+<div id="recrutamentoModal" class="modalOverlay hidden">
+  <div class="modalBox">
+    <h2>Registrar recrutamento</h2>
+
+    <label>Nome</label>
+    <input id="recNome" placeholder="Nome">
+
+    <label>ID</label>
+    <input id="recID" placeholder="ID">
+
+    <div class="modalActions">
+      <button class="delete" onclick="fecharModalRecrutamento()">Cancelar</button>
+      <button onclick="enviarRecrutamento()">Enviar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 
 const SUPABASE_URL = "https://umoadjffjupzakioudnj.supabase.co";
@@ -605,6 +699,71 @@ function rodapeLinks(){
 }
 
 
+function escaparHTML(texto){
+  return String(texto || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+function formatarTexto(texto){
+  let seguro = escaparHTML(texto);
+
+  seguro = seguro
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    .replace(/__(.*?)__/g, "<b>$1</b>")
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+    .replace(/_(.*?)_/g, "<i>$1</i>")
+    .replace(/`(.*?)`/g, "<code>$1</code>");
+
+  return seguro.replace(/\n/g, "<br>");
+}
+
+
+function uploadBox(id){
+  return `
+    <div id="${id}" class="uploadStatus">
+      <div class="progressBar">
+        <div class="progressFill"></div>
+      </div>
+      <div class="progressText">Preparando anexo...</div>
+    </div>
+  `;
+}
+
+
+function atualizarUpload(id, porcentagem, texto){
+  const box = document.getElementById(id);
+  if(!box) return;
+
+  box.classList.add("ativo");
+
+  const fill = box.querySelector(".progressFill");
+  const label = box.querySelector(".progressText");
+
+  if(fill) fill.style.width = `${porcentagem}%`;
+  if(label) label.textContent = texto || `${porcentagem}% carregado`;
+}
+
+
+function esconderUpload(id){
+  const box = document.getElementById(id);
+  if(!box) return;
+
+  setTimeout(() => {
+    box.classList.remove("ativo");
+    const fill = box.querySelector(".progressFill");
+    const label = box.querySelector(".progressText");
+
+    if(fill) fill.style.width = "0%";
+    if(label) label.textContent = "Preparando anexo...";
+  }, 700);
+}
+
+
 function renderMidia(midia, tipo){
   if(!midia) return "";
 
@@ -616,8 +775,8 @@ function renderMidia(midia, tipo){
 }
 
 
-function arquivoParaBase64(file){
-  return new Promise((resolve) => {
+function arquivoParaBase64(file, progressoId = null){
+  return new Promise((resolve, reject) => {
     if(!file){
       resolve({ midia: null, tipo: null });
       return;
@@ -625,11 +784,30 @@ function arquivoParaBase64(file){
 
     const reader = new FileReader();
 
+    if(progressoId){
+      atualizarUpload(progressoId, 0, "Preparando anexo...");
+    }
+
+    reader.onprogress = function(e){
+      if(e.lengthComputable && progressoId){
+        const porcentagem = Math.round((e.loaded / e.total) * 100);
+        atualizarUpload(progressoId, porcentagem, `${porcentagem}% carregado`);
+      }
+    };
+
     reader.onload = function(e){
+      if(progressoId){
+        atualizarUpload(progressoId, 100, "Anexo carregado. Enviando...");
+      }
+
       resolve({
         midia: e.target.result,
         tipo: file.type
       });
+    };
+
+    reader.onerror = function(){
+      reject(new Error("Erro ao carregar o anexo."));
     };
 
     reader.readAsDataURL(file);
@@ -655,9 +833,10 @@ async function renderPosts(categoria, titulo, mostrarCapa){
     html += `
       <div class="card">
         <h2>Nova postagem</h2>
-        <textarea id="postTexto" placeholder="Texto da postagem"></textarea>
+        <textarea id="postTexto" placeholder="Texto da postagem. Use **palavra** para negrito."></textarea>
         <input id="postArquivo" type="file" accept="image/png,image/jpg,image/jpeg,image/gif,video/*">
-        <button onclick="criarPost('${categoria}')">Publicar</button>
+        ${uploadBox("uploadPost")}
+        <button id="btnPublicarPost" onclick="criarPost('${categoria}')">Publicar</button>
       </div>
     `;
   }
@@ -669,7 +848,7 @@ async function renderPosts(categoria, titulo, mostrarCapa){
   data.forEach(post => {
     html += `
       <div class="card post">
-        <p>${post.texto || ""}</p>
+        <p class="formattedText">${formatarTexto(post.texto)}</p>
         ${renderMidia(post.midia, post.tipo_midia)}
         ${podePostar(categoria) ? `
           <br><br>
@@ -694,7 +873,18 @@ async function criarPost(categoria){
     return;
   }
 
-  const arquivo = await arquivoParaBase64(file);
+  if(typeof btnPublicarPost !== "undefined") btnPublicarPost.disabled = true;
+
+  let arquivo;
+
+  try{
+    arquivo = await arquivoParaBase64(file, "uploadPost");
+  }catch(e){
+    alert(e.message);
+    if(typeof btnPublicarPost !== "undefined") btnPublicarPost.disabled = false;
+    esconderUpload("uploadPost");
+    return;
+  }
 
   const { error } = await db.from("posts").insert({
     categoria,
@@ -706,10 +896,13 @@ async function criarPost(categoria){
 
   if(error){
     alert(error.message);
+    if(typeof btnPublicarPost !== "undefined") btnPublicarPost.disabled = false;
+    esconderUpload("uploadPost");
     return;
   }
 
   await criarLog(`Postagem criada em ${categoria}`);
+  esconderUpload("uploadPost");
   abrir(categoria);
 }
 
@@ -754,9 +947,10 @@ async function renderVirtus(){
     html += `
       <div class="card">
         <h2>Nova postagem</h2>
-        <textarea id="postTexto" placeholder="Texto da postagem"></textarea>
+        <textarea id="postTexto" placeholder="Texto da postagem. Use **palavra** para negrito."></textarea>
         <input id="postArquivo" type="file" accept="image/png,image/jpg,image/jpeg,image/gif,video/*">
-        <button onclick="criarPost('virtus')">Publicar</button>
+        ${uploadBox("uploadPost")}
+        <button id="btnPublicarPost" onclick="criarPost('virtus')">Publicar</button>
       </div>
     `;
   }
@@ -768,7 +962,7 @@ async function renderVirtus(){
   data.forEach(post => {
     html += `
       <div class="card post">
-        <p>${post.texto || ""}</p>
+        <p class="formattedText">${formatarTexto(post.texto)}</p>
         ${renderMidia(post.midia, post.tipo_midia)}
         ${podePostar("virtus") ? `
           <br><br>
@@ -794,7 +988,7 @@ async function renderRecrutamento(){
 
     <div class="card">
       <h2>Registrar recrutamento</h2>
-      <button onclick="registrarRecrutamento()">+ Registrar recrutamento</button>
+      <button onclick="abrirModalRecrutamento()">+ Registrar recrutamento</button>
     </div>
 
     <div class="card">
@@ -825,7 +1019,33 @@ async function renderRecrutamento(){
 }
 
 
-async function registrarRecrutamento(){
+function abrirModalRecrutamento(){
+  recNome.value = "";
+  recID.value = "";
+  recrutamentoModal.classList.remove("hidden");
+}
+
+
+function fecharModalRecrutamento(){
+  recrutamentoModal.classList.add("hidden");
+}
+
+
+async function enviarRecrutamento(){
+  const nome = recNome.value.trim();
+  const id = recID.value.trim();
+
+  if(!nome || !id){
+    alert("Preencha Nome e ID.");
+    return;
+  }
+
+  await registrarRecrutamento(nome, id);
+  fecharModalRecrutamento();
+}
+
+
+async function registrarRecrutamento(nome, id){
   const busca = await db
     .from("recrutamentos")
     .select("*")
@@ -846,7 +1066,7 @@ async function registrarRecrutamento(){
       });
   }
 
-  await criarLog(`${usuarioAtual.usuario} registrou recrutamento`);
+  await criarLog(`${usuarioAtual.usuario} registrou recrutamento | Nome: ${nome} | ID: ${id}`);
   renderRecrutamento();
 }
 async function renderElite(){
@@ -993,11 +1213,13 @@ async function renderSorteio(){
       <div class="card">
         <h2>Criar anúncio de sorteio</h2>
 
-        <textarea id="sorteioTexto" placeholder="Texto do sorteio"></textarea>
+        <textarea id="sorteioTexto" placeholder="Texto do sorteio. Use **palavra** para negrito."></textarea>
 
         <input id="sorteioArquivo" type="file" accept="image/png,image/jpg,image/jpeg,image/gif,video/*">
 
-        <button onclick="criarSorteio()">Criar sorteio</button>
+        ${uploadBox("uploadSorteio")}
+
+        <button id="btnCriarSorteio" onclick="criarSorteio()">Criar sorteio</button>
       </div>
     `;
   }
@@ -1018,7 +1240,7 @@ async function renderSorteio(){
     html += `
       <div class="card post">
 
-        <p>${sorteio.texto || ""}</p>
+        <p class="formattedText">${formatarTexto(sorteio.texto)}</p>
 
         ${renderMidia(sorteio.midia, sorteio.tipo_midia)}
 
@@ -1061,7 +1283,18 @@ async function criarSorteio(){
     return;
   }
 
-  const arquivo = await arquivoParaBase64(file);
+  if(typeof btnCriarSorteio !== "undefined") btnCriarSorteio.disabled = true;
+
+  let arquivo;
+
+  try{
+    arquivo = await arquivoParaBase64(file, "uploadSorteio");
+  }catch(e){
+    alert(e.message);
+    if(typeof btnCriarSorteio !== "undefined") btnCriarSorteio.disabled = false;
+    esconderUpload("uploadSorteio");
+    return;
+  }
 
   const { error } = await db.from("sorteios").insert({
     texto,
@@ -1072,10 +1305,13 @@ async function criarSorteio(){
 
   if(error){
     alert(error.message);
+    if(typeof btnCriarSorteio !== "undefined") btnCriarSorteio.disabled = false;
+    esconderUpload("uploadSorteio");
     return;
   }
 
   await criarLog("Sorteio criado");
+  esconderUpload("uploadSorteio");
   renderSorteio();
 }
 
