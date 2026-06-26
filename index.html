@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>The Angels Legacy</title>
+<title>Nextage</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -332,6 +332,20 @@ fill:#00bcff;
 display:block;
 }
 
+.btnIcon{
+display:inline-flex;
+width:18px;
+height:18px;
+vertical-align:middle;
+margin-right:6px;
+}
+
+.btnIcon svg{
+width:18px;
+height:18px;
+fill:currentColor;
+}
+
 .resultadoOpcoes{
 display:flex;
 gap:12px;
@@ -474,49 +488,29 @@ Solicitar cadastro
 <div class="menu">
 
 
-<button onclick="abrir('angels')">
-THE ANGELS
-</button>
+<button onclick="abrir('angels')"><span id="menuAngels">NEXTAGE</span></button>
 
 
-<button onclick="abrir('recrutamento')">
-RECRUTAMENTO
-</button>
+<button onclick="abrir('recrutamento')"><span id="menuRecrutamento">RECRUTAMENTO</span></button>
 
 
-<button onclick="abrir('elite')">
-ELITE LEGACY
-</button>
+<button onclick="abrir('elite')"><span id="menuElite">ELITE LEGACY</span></button>
 
 
-<button onclick="abrir('eventos')">
-EVENTOS
-</button>
+<button onclick="abrir('eventos')"><span id="menuEventos">EVENTOS</span></button>
 
 
-<button onclick="abrir('sorteio')">
-SORTEIO
-</button>
+<button onclick="abrir('sorteio')"><span id="menuSorteio">SORTEIO</span></button>
 
 
-<button onclick="abrir('virtus')">
-VIRTUS RP
-</button>
+<button onclick="abrir('virtus')"><span id="menuVirtus">VIRTUS RP</span></button>
 
 
 
-<button id="btnLogs"
-class="hidden"
-onclick="abrir('logs')">
-LOGS
-</button>
+<button id="btnLogs" class="hidden" onclick="abrir('logs')"><span id="menuLogs">LOGS</span></button>
 
 
-<button id="btnGerenciar"
-class="hidden"
-onclick="abrir('gerenciar')">
-GERENCIAR
-</button>
+<button id="btnGerenciar" class="hidden" onclick="abrir('gerenciar')"><span id="menuGerenciar">GERENCIAR</span></button>
 
 
 
@@ -573,6 +567,68 @@ let config = {};
 let paginaAtual = "angels";
 
 
+const NOMES_CATEGORIAS_PADRAO = {
+  angels: "NEXTAGE",
+  recrutamento: "RECRUTAMENTO",
+  elite: "ELITE LEGACY",
+  eventos: "EVENTOS",
+  sorteio: "SORTEIO",
+  virtus: "VIRTUS RP",
+  logs: "LOGS",
+  gerenciar: "GERENCIAR"
+};
+
+function pegarNomesCategorias(){
+  try{
+    const salvos = JSON.parse(localStorage.getItem("nextage_nomes_categorias") || "{}");
+    return { ...NOMES_CATEGORIAS_PADRAO, ...salvos };
+  }catch(e){
+    return { ...NOMES_CATEGORIAS_PADRAO };
+  }
+}
+
+function nomeCategoria(chave){
+  return pegarNomesCategorias()[chave] || NOMES_CATEGORIAS_PADRAO[chave] || chave;
+}
+
+function aplicarNomesCategorias(){
+  const nomes = pegarNomesCategorias();
+  const mapa = {
+    menuAngels: nomes.angels,
+    menuRecrutamento: nomes.recrutamento,
+    menuElite: nomes.elite,
+    menuEventos: nomes.eventos,
+    menuSorteio: nomes.sorteio,
+    menuVirtus: nomes.virtus,
+    menuLogs: nomes.logs,
+    menuGerenciar: nomes.gerenciar
+  };
+
+  Object.entries(mapa).forEach(([id, texto]) => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = texto;
+  });
+}
+
+function salvarNomesCategorias(){
+  const nomes = {
+    angels: nomeCatAngels.value.trim() || NOMES_CATEGORIAS_PADRAO.angels,
+    recrutamento: nomeCatRecrutamento.value.trim() || NOMES_CATEGORIAS_PADRAO.recrutamento,
+    elite: nomeCatElite.value.trim() || NOMES_CATEGORIAS_PADRAO.elite,
+    eventos: nomeCatEventos.value.trim() || NOMES_CATEGORIAS_PADRAO.eventos,
+    sorteio: nomeCatSorteio.value.trim() || NOMES_CATEGORIAS_PADRAO.sorteio,
+    virtus: nomeCatVirtus.value.trim() || NOMES_CATEGORIAS_PADRAO.virtus,
+    logs: nomeCatLogs.value.trim() || NOMES_CATEGORIAS_PADRAO.logs,
+    gerenciar: nomeCatGerenciar.value.trim() || NOMES_CATEGORIAS_PADRAO.gerenciar
+  };
+
+  localStorage.setItem("nextage_nomes_categorias", JSON.stringify(nomes));
+  aplicarNomesCategorias();
+  alert("Nomes das categorias salvos neste navegador.");
+  renderGerenciar();
+}
+
+
 async function carregarConfig(){
   const { data } = await db
     .from("configuracoes")
@@ -581,6 +637,7 @@ async function carregarConfig(){
     .single();
 
   config = data || {};
+  aplicarNomesCategorias();
 
   if(config.fundo){
     document.body.style.backgroundImage = `url(${config.fundo})`;
@@ -716,8 +773,8 @@ async function abrir(pagina){
 
   await carregarConfig();
 
-  if(pagina === "angels") renderPosts("angels", "THE ANGELS", true);
-  if(pagina === "eventos") renderPosts("eventos", "EVENTOS", false);
+  if(pagina === "angels") renderPosts("angels", nomeCategoria("angels"), true);
+  if(pagina === "eventos") renderPosts("eventos", nomeCategoria("eventos"), false);
   if(pagina === "virtus") renderVirtus();
   if(pagina === "recrutamento") renderRecrutamento();
   if(pagina === "elite") renderElite();
@@ -991,10 +1048,10 @@ async function renderVirtus(){
 
   let html = `
     <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
-      <h1>VIRTUS RP</h1>
+      <h1>${nomeCategoria("virtus")}</h1>
       ${config.discord_virtus ? `
         <a href="${config.discord_virtus}" target="_blank">
-          <button class="discord">💬 DISCORD</button>
+          <button class="discord"><span class="btnIcon">${iconeRede("discord")}</span> DISCORD</button>
         </a>
       ` : ""}
     </div>
@@ -1041,7 +1098,7 @@ async function renderRecrutamento(){
     .order("quantidade", { ascending: false });
 
   let html = `
-    <h1>RECRUTAMENTO</h1>
+    <h1>${nomeCategoria("recrutamento")}</h1>
 
     <div class="card">
       <h2>Registrar recrutamento</h2>
@@ -1140,7 +1197,7 @@ async function renderElite(){
   const pctDerrota = total ? Math.round((derrotas / total) * 100) : 0;
 
   let html = `
-    <h1>ELITE LEGACY</h1>
+    <h1>${nomeCategoria("elite")}</h1>
         ${config.capa_elite ? `
       <img src="${config.capa_elite}" 
       style="width:100%;max-height:238px;object-fit:cover;border-radius:15px;margin-bottom:20px;">
@@ -1261,7 +1318,7 @@ async function renderSorteio(){
     .select("*")
     .order("criado_em", { ascending: false });
 
-  let html = `<h1>SORTEIO</h1>`;
+  let html = `<h1>${nomeCategoria("sorteio")}</h1>`;
 
   if(usuarioAtual.cargo === "admin"){
     html += `
@@ -1455,7 +1512,7 @@ async function renderLogs(){
     .order("criado_em", { ascending: false });
 
   let html = `
-    <h1>LOGS</h1>
+    <h1>${nomeCategoria("logs")}</h1>
 
     <div class="card logs">
   `;
@@ -1499,7 +1556,7 @@ async function renderGerenciar(){
     .order("criado_em", { ascending: false });
 
   let html = `
-    <h1>GERENCIAR</h1>
+    <h1>${nomeCategoria("gerenciar")}</h1>
 
     <div class="card">
       <h2>Membros pendentes</h2>
@@ -1546,6 +1603,22 @@ async function renderGerenciar(){
   });
 
   html += `
+    </div>
+
+
+    <div class="card">
+      <h2>Editar nomes das categorias laterais</h2>
+
+      <input id="nomeCatAngels" placeholder="Categoria principal" value="${nomeCategoria("angels")}">
+      <input id="nomeCatRecrutamento" placeholder="Recrutamento" value="${nomeCategoria("recrutamento")}">
+      <input id="nomeCatElite" placeholder="Elite" value="${nomeCategoria("elite")}">
+      <input id="nomeCatEventos" placeholder="Eventos" value="${nomeCategoria("eventos")}">
+      <input id="nomeCatSorteio" placeholder="Sorteio" value="${nomeCategoria("sorteio")}">
+      <input id="nomeCatVirtus" placeholder="Virtus RP" value="${nomeCategoria("virtus")}">
+      <input id="nomeCatLogs" placeholder="Logs" value="${nomeCategoria("logs")}">
+      <input id="nomeCatGerenciar" placeholder="Gerenciar" value="${nomeCategoria("gerenciar")}">
+
+      <button onclick="salvarNomesCategorias()">Salvar nomes das categorias</button>
     </div>
 
     <div class="card">
@@ -1679,6 +1752,7 @@ async function salvarImagens(){
 
 
 async function iniciar(){
+  aplicarNomesCategorias();
   await carregarConfig();
 }
 
